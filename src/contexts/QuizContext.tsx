@@ -5,6 +5,9 @@ import {
   useEffect,
   useReducer,
 } from "react";
+import questions from "../components/data/questions.json";
+let { questions: getQuestions } = questions;
+
 const SECS_PER_QUESTION: Number = 30;
 type IsInitialize = {
   status: String; // required
@@ -24,7 +27,7 @@ const initialize: IsInitialize = {
   status: "loading",
 
   // optional
-  questions: [],
+  questions: getQuestions,
   index: 0, // index based in the number per each question
   answer: null, // null basically nothing to do, but if click the Correct answer will be display temporary value
   payload: null, // display current correct answer
@@ -125,31 +128,26 @@ function QuizContext({ children }: { children: ReactNode }) {
 
   const numQuestions = questions?.length || totalQuestion;
 
-  const maxPossiblePoints: Number = questions.reduce(
-    (acc: Number, curr: any) => {
+  const maxPossiblePoints: Number =
+    questions?.reduce((acc: Number, curr: any) => {
       return +acc + +curr.points;
-    },
-    0
-  );
+    }, 0) ?? 0;
 
   useEffect(function () {
     async function fetchApiQuiz(): Promise<any> {
       try {
-        const controller = new AbortController();
+        // const controller = new AbortController();
 
-        const res = await fetch(
-          `https://react-quiz-itechpaulj.netlify.app/data/questions.json`,
-          {
-            signal: controller.signal,
-          }
-        );
+        // const res = await fetch(`https://react-quiz-itechpaulj.netlify.app`, {
+        //   signal: controller.signal,
+        // });
 
-        if (!res.ok) {
-          throw new Error(`Status: ${res.status}, Error: ${res.statusText}`);
-        }
+        // if (!res.ok) {
+        //   throw new Error(`Status: ${res.status}, Error: ${res.statusText}`);
+        // }
 
-        const dataJson = await res.json();
-        const result = dataJson;
+        // const dataJson = await res.json();
+        const result = questions;
 
         dispatch({
           type: "dataRecieved",
@@ -193,8 +191,9 @@ function QuizContext({ children }: { children: ReactNode }) {
 
 function QuizUseContext() {
   const context = useContext(QuizCreateContext);
+
   if (!context) {
-    throw new Error("There was a proble useContext");
+    throw new Error("There was a problem useContext");
   }
 
   return context;
